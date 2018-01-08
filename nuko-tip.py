@@ -5,10 +5,10 @@ import fnmatch
 from web3 import Web3,HTTPProvider
 
 keystoredir = "/home/pi/.nekonium/keystore"
-bottoken = 'bottoken'
+bottoken = 'Mzk5OTI0NjkyMTQxNjA0ODc1.DTUKtg.X-kVvDhrx3GNJgUaawnFY6wkDTU'
 
 print(discord.__version__)
-web3 = Web3(HTTPProvider('http://127.0.0.1:8293'))
+web3 = Web3(HTTPProvider('http://localhost:8293'))
 
 balancecomm = ["!manekinuko","balance"]
 mkwalletcomm = ["!manekinuko","mkwallet","password","password"]
@@ -95,7 +95,7 @@ def accunlock(user_name, password):
     with open("add_dict.json",'r') as f:
         address_dict = json.load(f)
     if (user_name in address_dict) == True:
-        unlock =  web3.personal.unlockAccount(address_dict[user_name],password)
+        unlock =  web3.personal.unlockAccount(address_dict[user_name],password,duration=hex(3600))
         state = user_name + " account unlock " + str(unlock)
     else:
         state = user_name + "You don't have address." 
@@ -157,8 +157,8 @@ async def on_message(message):
 
                 #アカウントアンロック ,! unlock password
                 elif (messagel_list[1] == unlockcomm[1]) and (len(messagel_list) == len(unlockcomm)):
-                    say = message.author.mention + ", unlock. plz wait..."
-                    await client.send_message(message.channel,say)
+#                    say = message.author.mention + ", unlock. plz wait..."
+#                    await client.send_message(message.channel,say)
                     say = accunlock(message.author.mention, messagel_list[2])
                     await client.send_message(message.channel,say)
                 
