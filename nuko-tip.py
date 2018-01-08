@@ -5,7 +5,7 @@ import fnmatch
 from web3 import Web3,HTTPProvider
 
 keystoredir = "/home/pi/.nekonium/keystore"
-bottoken = 'Mzk5OTI0NjkyMTQxNjA0ODc1.DTUKtg.X-kVvDhrx3GNJgUaawnFY6wkDTU'
+bottoken = 'bottoken'
 
 print(discord.__version__)
 web3 = Web3(HTTPProvider('http://localhost:8293'))
@@ -77,12 +77,13 @@ def tipping(user_name, user_name2, value):
         address_dict = json.load(f)
     #アドレス確認
     if ((user_name in address_dict) == True) and ((user_name2 in address_dict) == True):
-        state = "tip\nfrom:[" + address_dict[user_name] + "]\nto:[" + address_dict[user_name2] + "], \nvalue:" + str(value) + " nuko\n"
+        #state = "tip\nfrom:[" + address_dict[user_name] + "]\nto:[" + address_dict[user_name2] + "], \nvalue:" + str(value) + " nuko\n"
         unlock =  True#web3.personal.unlockAccount(address_dict[user_name],"test")
         if unlock == True:
             trans = web3.eth.sendTransaction({"to": address_dict[user_name2], "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
-            state = state + "unlock true\n"
-            state = state + "trans:" + trans + "\n"
+            #state = state + "unlock true\n"
+            #state = state + "trans:" + trans + "\n"
+            state ="trans:" + trans + "\n"
         else:
             state = state + "unlock error\n"
     else:
@@ -173,16 +174,16 @@ async def on_message(message):
 
                 #help
                 elif (messagel_list[1] == helpcomm[1]) and (len(messagel_list) == len(helpcomm)):
-                    say = "=====================\n!manekinuko balance\nアカウントの状態を確認します．\n"
-                    say = say + "============================\n!manekinuko mkwallet password1 password2\nアカウントを作成します．password1とpassword2は同じものを入力してください．\n"
-                    say = say + "===========================\n!manekinuko tip @foobar value\n猫を投げます．valueはnukoの数値です\n"
-                    say = say + "===========================\n!manekinuko unlock password\ntipする前にやってください．\n返答に時間がかかる場合があります．\n"
-                    say = say + "===========================\n!manekinuko getkey\nkeystoreを受け取れます．\n"
-                    say= say + "============================\n!manekinuko whatadd @foo\n相手のアドレスを表示します\n"
+                    say = "=====================\n!manekinuko balance\nアカウントの状態を確認します．\n(Show balance)\n"
+                    say = say + "============================\n!manekinuko mkwallet password1 password2\nアカウントを作成します．\npassword1とpassword2は同じものを入力してください．\n(Make your account. password1 and password2 must be the same)\n"
+                    say = say + "===========================\n!manekinuko tip @foobar value\n猫を投げます．valueはnukoの数値です\n(tip nuko.)\n"
+                    say = say + "===========================\n!manekinuko unlock password\ntipする前にやってください．\n(Do before tip.)\n返答に時間がかかる場合があります．\n(It takes time to respond.)\n"
+                    say = say + "===========================\n!manekinuko getkey\nkeystoreを受け取れます．\n(You can download keystore.)\n"
+                    say= say + "============================\n!manekinuko whatadd @foo\n相手のアドレスを表示します\n(Show @foo address.)\n"
                     #await client.send_message(message.channel,say)
                     say = say + "\n開発中のためGOXする可能性があります．\n預けnukoは最小限におねがいします．\n"
-                    say = say + "またmkwalletとunlockとgetkeyはbotとのDMで行うことをおすすめします．\n"
-                    say = say + "getkeyは必ず行ってください\n"
+                    say = say + "またmkwalletとunlockとgetkeyはbotとのDMで行うことをおすすめします．\n(makewallet,unlock and getkey must be done with DM with manekinuko.)\n"
+                    say = say + "getkeyは必ず行ってください\n(It is necessary to do getkey without fall.)\n"
                     say = say + "raspberry pi2で動いてますいじめないであげてください\n"
                     await client.send_message(message.channel,say)
                 #error
