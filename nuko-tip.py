@@ -83,7 +83,7 @@ def tipping(user_name, user_name2, value):
             trans = web3.eth.sendTransaction({"to": address_dict[user_name2], "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
             #state = state + "unlock true\n"
             #state = state + "trans:" + trans + "\n"
-            state ="http://nekonium.network/tx/" + trans + "\n"
+            state ="http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
         else:
             state = state + "unlock error\n"
     else:
@@ -126,8 +126,7 @@ async def on_message(message):
     #マジックナンバー
     if message.content.startswith("!manekinuko"):
         #メッセージ分割
-        messagel_list = str(message.content).split(' ')
-        messagel_list = filter(lambda s:s != '', messagel_list)
+        messagel_list = str(message.content).split()
         #自分じゃないかの確認
         if client.user != message.author:
             if len(messagel_list)>1:
