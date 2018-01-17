@@ -4,8 +4,9 @@ import os
 import fnmatch
 from web3 import Web3,HTTPProvider
 
-keystoredir = "/home/pi/.nekonium/keystore"
-bottoken = ''
+keystoredir = "/home/manekinuko/.nekonium/keystore"
+#bottoken = ''#テスト用
+bottoken = ''#本番
 
 print(discord.__version__)
 web3 = Web3(HTTPProvider('http://localhost:8293'))
@@ -14,6 +15,7 @@ balancecomm = ["!manekinuko","balance"]
 mkwalletcomm = ["!manekinuko","mkaccount","password","password"]
 getkeycomm = ["!manekinuko","getkey"]
 tippingcomm = ["!manekinuko","tip","@foo","value"]
+sendcomm = ["!manekinuko","send","address","value"]
 unlockcomm = ["!manekinuko","unlock","password"]
 helpcomm = ["!manekinuko","help"]
 whataddcomm = ["!manekinuko","show", "@foo"]
@@ -71,6 +73,7 @@ def pkey(user_name):
     print(keyname)
     return keyname
 
+#ぬこtip
 def tipping(user_name, user_name2, value):
     #アドレス読み込み
     with open("add_dict.json",'r') as f:
@@ -88,6 +91,18 @@ def tipping(user_name, user_name2, value):
             state = state + "unlock error\n"
     else:
         state = user_name + "か" + user_name2 + "はアカウント作って無いニャん。\n(" + user_name + "or" + user_name2 + " don't have account. mkaccount plz.)"
+    return state
+
+#ぬこ送信
+def send2add(user_name, toaddress, value):
+    #アドレス帳読み込み
+    with open("add_dict.json",'r') as f:
+        address_dict = json.load(f)
+    if ((user_name in address_dict) == True):
+        trans = web3.eth.sendTransaction({"to": toaddress, "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
+        state =user_name + "->" + toaddress + ":value=" + str(value) + "\n" + "http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
+    else:
+        state = user_name + "はアカウントを作ってないニャん。\n(You don't have account. mkaccount plz.)"
     return state
 
 def accunlock(user_name, password):
@@ -157,10 +172,15 @@ async def on_message(message):
                     say = "tip " + message.author.mention + " to " + messagel_list[2] + " " + messagel_list[3] + " nuko\n"
                     say =say + tipping(message.author.mention,messagel_list[2],float(messagel_list[3]))
                     await client.send_message(message.channel,say)
+                
+                #アドレスに送る
+                elif (messagel_list[1] == sendcomm[1]) and (len(messagel_list) == len(sendcomm)):
+                    say = send2add(message.author.mention, messagel_list[2], float(messagel_list[3]))
+                    await client.send_message(message.channel,say)
 
                 #アカウントアンロック ,! unlock password
                 elif (messagel_list[1] == unlockcomm[1]) and (len(messagel_list) == len(unlockcomm)):
-                    say = message.author.mention + ", unlock. plz wait..."
+                    say = message.author.mention + ", unlock. plz wait...(If no reaction 20sec. try agein)"
                     await client.send_message(message.channel,say)
                     say = accunlock(message.author.mention, messagel_list[2])
                     await client.send_message(message.channel,say)
