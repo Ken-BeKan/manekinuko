@@ -80,15 +80,13 @@ def tipping(user_name, user_name2, value):
         address_dict = json.load(f)
     #アドレス確認
     if ((user_name in address_dict) == True) and ((user_name2 in address_dict) == True):
-        #state = "tip\nfrom:[" + address_dict[user_name] + "]\nto:[" + address_dict[user_name2] + "], \nvalue:" + str(value) + " nuko\n"
         unlock =  True#web3.personal.unlockAccount(address_dict[user_name],"test")
-        if unlock == True:
+        try:
             trans = web3.eth.sendTransaction({"to": address_dict[user_name2], "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
-            #state = state + "unlock true\n"
-            #state = state + "trans:" + trans + "\n"
-            state ="http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
-        else:
-            state = state + "unlock error\n"
+            break;
+        except ValueError:
+            state ="アカウントがアンロックされてないニャン\n(unlock error.Use [unlock] commnad.)"
+        state ="http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
     else:
         state = user_name + "か" + user_name2 + "はアカウント作って無いニャん。\n(" + user_name + "or" + user_name2 + " don't have account. mkaccount plz.)"
     return state
