@@ -5,8 +5,7 @@ import fnmatch
 from web3 import Web3,HTTPProvider
 
 keystoredir = "/home/manekinuko/.nekonium/keystore"
-#bottoken = ''#テスト用
-bottoken = ''#本番
+bottoken = ''
 
 print(discord.__version__)
 web3 = Web3(HTTPProvider('http://localhost:8293'))
@@ -80,15 +79,12 @@ def tipping(user_name, user_name2, value):
         address_dict = json.load(f)
     #アドレス確認
     if ((user_name in address_dict) == True) and ((user_name2 in address_dict) == True):
-        #state = "tip\nfrom:[" + address_dict[user_name] + "]\nto:[" + address_dict[user_name2] + "], \nvalue:" + str(value) + " nuko\n"
-        unlock =  True#web3.personal.unlockAccount(address_dict[user_name],"test")
-        if unlock == True:
+        try:
             trans = web3.eth.sendTransaction({"to": address_dict[user_name2], "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
-            #state = state + "unlock true\n"
-            #state = state + "trans:" + trans + "\n"
-            state ="http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
-        else:
-            state = state + "unlock error\n"
+        except ValueError:
+            state ="アカウントがアンロックされてないニャン\n(unlock error.Use [unlock] commnad.)"
+            return state
+        state ="http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
     else:
         state = user_name + "か" + user_name2 + "はアカウント作って無いニャん。\n(" + user_name + "or" + user_name2 + " don't have account. mkaccount plz.)"
     return state
@@ -99,7 +95,11 @@ def send2add(user_name, toaddress, value):
     with open("add_dict.json",'r') as f:
         address_dict = json.load(f)
     if ((user_name in address_dict) == True):
-        trans = web3.eth.sendTransaction({"to": toaddress, "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
+        try:
+            trans = web3.eth.sendTransaction({"to": toaddress, "from": address_dict[user_name], "value": web3.toWei(value,"ether")})
+        except ValueError:
+            state ="アカウントがアンロックされてないニャン\n(unlock error.Use [unlock] commnad.)"
+            return state
         state =user_name + "->" + toaddress + ":value=" + str(value) + "\n" + "http://nekonium.network/tx/" + trans + "\nhttp://explorer.nekonium.org/tx/" + trans
     else:
         state = user_name + "はアカウントを作ってないニャん。\n(You don't have account. mkaccount plz.)"
@@ -202,7 +202,6 @@ async def on_message(message):
                     say = say + "===========================\n!manekinuko unlock password\ntipする前にやってください．\n(Do before tip.)\n返答に時間がかかる場合があります．\n(It takes time to respond.)\n"
                     say = say + "===========================\n!manekinuko getkey\nkeystoreを受け取れます．\n(You can download keystore.)\n"
                     say= say + "============================\n!manekinuko show @foo\n相手のアドレスを表示します\n(Show @foo address.)\n"
-                    #await client.send_message(message.channel,say)
                     say = say + "\n開発中のためGOXする可能性があります．\n預けnukoは最小限におねがいします．\n"
                     say = say + "またmkaccountとunlockとgetkeyはbotとのDMで行うことをおすすめします．\n(makewallet,unlock and getkey must be done with DM with manekinuko.)\n"
                     say = say + "getkeyは必ず行ってください\n(It is necessary to do getkey without fall.)\n"
